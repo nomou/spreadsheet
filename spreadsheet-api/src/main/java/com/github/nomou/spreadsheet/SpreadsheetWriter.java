@@ -21,6 +21,7 @@ public interface SpreadsheetWriter extends SpreadsheetConfigurable<SpreadsheetWr
     /**
      * Create a worksheet with the given name and start writing to it.
      *
+     * @param worksheetName the name of worksheet
      * @return the current spreadsheet writer
      * @throws SpreadsheetException if a write error occurs
      */
@@ -29,6 +30,7 @@ public interface SpreadsheetWriter extends SpreadsheetConfigurable<SpreadsheetWr
     /**
      * Write the given Boolean value.
      *
+     * @param bool the value
      * @return the current spreadsheet writer
      * @throws SpreadsheetException if a write error occurs
      */
@@ -56,6 +58,7 @@ public interface SpreadsheetWriter extends SpreadsheetConfigurable<SpreadsheetWr
      * Write the date value using the given pattern.
      *
      * @param date the value
+     * @param pattern the pattern for date
      * @return the current spreadsheet writer
      * @throws SpreadsheetException if a write error occurs
      */
@@ -105,7 +108,6 @@ public interface SpreadsheetWriter extends SpreadsheetConfigurable<SpreadsheetWr
     /**
      * End the writing of the current spreadsheet and close it.
      *
-     * @return the current spreadsheet writer
      * @throws SpreadsheetException if a write error occurs
      */
     void close() throws SpreadsheetException;

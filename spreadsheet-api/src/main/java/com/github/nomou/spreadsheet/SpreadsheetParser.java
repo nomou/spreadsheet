@@ -125,7 +125,7 @@ public interface SpreadsheetParser extends SpreadsheetConfigurable<SpreadsheetPa
 
     /**
      * Get next parsing event.
-     * <p>
+     *
      * <p>Given the following workbook:<br>
      * sheet1: <br>
      * |----|----| <br>
@@ -141,7 +141,7 @@ public interface SpreadsheetParser extends SpreadsheetConfigurable<SpreadsheetPa
      * 8- then the end first row(END_RECORD)<br>
      * 9- then the end worksheet(END_WORKSHEET)<br>
      * 10- then the end workbook(END_WORKBOOK)<br>
-     * <p>
+     * </p>
      * This method will throw an IllegalStateException if it is called after hasNext() returns false.
      *
      * @return the integer code corresponding to the current parse event
