@@ -7,15 +7,18 @@
     <parent>
         <groupId>com.github.nomou</groupId>
         <artifactId>spreadsheet</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
     <artifactId>spreadsheet-ms-excel</artifactId>
+
+    <name>spreadsheet-ms-excel</name>
+    <description>a simple streaming spreadsheet for microsoft excel</description>
+    <url>https://github.com/nomou/spreadsheet.git</url>
 
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- 效率没有 POI 高, 暂时不用了.
@@ -28,31 +31,26 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.github.nomou</groupId>
             <artifactId>spreadsheet-api</artifactId>
-            <version>${spreadsheet-api.version}</version>
         </dependency>
         <dependency>
             <groupId>jexcelapi</groupId>
             <artifactId>jxl</artifactId>
-            <version>${jxl.version}</version>
             <optional>true</optional>
         </dependency>
         <!-- poi BEGIN -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>${poi.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>${poi.version}</version>
             <optional>true</optional>
         </dependency>
         <!-- poi END -->

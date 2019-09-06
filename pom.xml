@@ -7,7 +7,11 @@
     <groupId>com.github.nomou</groupId>
     <artifactId>spreadsheet</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
+
+    <name>spreadsheet</name>
+    <description>a simple streaming spreadsheet lib</description>
+    <url>https://github.com/nomou/spreadsheet.git</url>
 
     <modules>
         <module>spreadsheet-api</module>
@@ -36,7 +40,7 @@
     </developers>
 
     <scm>
-        <url>https://github.com/nomou/nougat</url>
+        <url>https://github.com/nomou/spreadsheet.git</url>
         <connection>scm:git:git@github.com:nomou/spreadsheet.git</connection>
         <developerConnection>scm:git:git@github.com:nomou/spreadsheet.git</developerConnection>
         <tag>HEAD</tag>
@@ -74,8 +78,8 @@
         <slf4j.version>1.7.7</slf4j.version>
         <jxl.version>2.6</jxl.version>
         <poi.version>3.9</poi.version>
-        <nougat.version>1.0.1</nougat.version>
-        <spreadsheet-api.version>1.0-SNAPSHOT</spreadsheet-api.version>
+        <nougat.version>1.0.2</nougat.version>
+        <spreadsheet.version>1.0.0</spreadsheet.version>
 
         <!-- distributionManagement [[ -->
         <!--
@@ -136,6 +140,11 @@
                 <groupId>com.github.nomou</groupId>
                 <artifactId>nougat-lang</artifactId>
                 <version>${nougat.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.nomou</groupId>
+                <artifactId>spreadsheet-api</artifactId>
+                <version>${spreadsheet.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -7,27 +7,28 @@
     <parent>
         <groupId>com.github.nomou</groupId>
         <artifactId>spreadsheet</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
 
     <artifactId>spreadsheet-csv</artifactId>
+
+    <name>spreadsheet-csv</name>
+    <description>a simple streaming spreadsheet for CSV</description>
+    <url>https://github.com/nomou/spreadsheet.git</url>
 
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.nomou</groupId>
             <artifactId>spreadsheet-api</artifactId>
-            <version>${spreadsheet-api.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
             <optional>true</optional>
         </dependency>
     </dependencies>

@@ -5,11 +5,15 @@
     <parent>
         <groupId>com.github.nomou</groupId>
         <artifactId>spreadsheet</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>spreadsheet-api</artifactId>
+
+    <name>spreadsheet-api</name>
+    <description>a simple streaming spreadsheet api</description>
+    <url>https://github.com/nomou/spreadsheet.git</url>
 
     <dependencies>
         <dependency>
