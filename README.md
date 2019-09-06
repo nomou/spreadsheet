@@ -2,6 +2,36 @@
   电子表格(csv, microsoft excel) 流式API（适用于不考虑表格样式,主要考虑数据的场景）
   
 # Usage
+### 引入依赖
+```xml
+    <dependency>
+        <groupId>com.github.nomou</groupId>
+        <artifactId>nougat-lang</artifactId>
+        <version>1.0.2</version>
+    </dependency>
+    
+    <dependency>
+        <groupId>com.github.nomou</groupId>
+        <artifactId>spreadsheet-api</artifactId>
+        <version>${spreadsheet.version}</version>
+    </dependency>
+    
+    <!-- spreadsheet 读写CSV文件实现 [[ -->
+    <dependency>
+        <groupId>com.github.nomou</groupId>
+        <artifactId>spreadsheet-csv</artifactId>
+        <version>${spreadsheet.version}</version>
+    </dependency>
+    <!-- ]] spreadsheet 读写CSV文件实现 -->
+    
+    <!-- spreadsheet 读写excel文件实现 [[ -->
+    <dependency>
+        <groupId>com.github.nomou</groupId>
+        <artifactId>spreadsheet-ms-excel</artifactId>
+        <version>${spreadsheet.version}</version>
+    </dependency>
+    <!-- ]] spreadsheet 读写excel文件实现 -->
+```
 ### 写入
 ```java
     final OutputStream out = new FileOutputStream("out.xlsx");
