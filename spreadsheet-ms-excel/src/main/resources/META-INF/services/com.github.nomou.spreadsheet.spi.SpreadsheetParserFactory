@@ -1,0 +1,2 @@
+com.github.nomou.spreadsheet.msexcel.LegacySpreadsheetParserFactory
+com.github.nomou.spreadsheet.msexcel.OpenXMLSpreadsheetParserFactory

@@ -1,0 +1,2 @@
+com.github.nomou.spreadsheet.msexcel.LegacySpreadsheetWriterFactory
+com.github.nomou.spreadsheet.msexcel.OpenXMLSpreadsheetWriterFactory

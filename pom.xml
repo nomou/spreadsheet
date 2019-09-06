@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.github.nomou</groupId>
+    <artifactId>spreadsheet</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+
+    <modules>
+        <module>spreadsheet-api</module>
+        <module>spreadsheet-csv</module>
+        <module>spreadsheet-ms-excel</module>
+    </modules>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>actable</distribution>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>nomou</name>
+        <url>https://github.com/nomou/</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <name>Changhe Yang</name>
+            <email>vacoor@qq.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/nomou/nougat</url>
+        <connection>scm:git:git@github.com:nomou/spreadsheet.git</connection>
+        <developerConnection>scm:git:git@github.com:nomou/spreadsheet.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <issueManagement>
+        <system>git@gitee Issue Management</system>
+        <url>https://github.com/nomou/spreadsheet/issues</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>Travis CI</system>
+        <url>https://travis-ci.org/spreadsheet/</url>
+    </ciManagement>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>${dist.mgt.snap-repo.id}</id>
+            <url>${dist.mgt.snap-repo.url}</url>
+        </snapshotRepository>
+        <repository>
+            <id>${dist.mgt.repo.id}</id>
+            <url>${dist.mgt.repo.url}</url>
+        </repository>
+    </distributionManagement>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <junit.version>4.11</junit.version>
+        <slf4j.version>1.7.7</slf4j.version>
+        <jxl.version>2.6</jxl.version>
+        <poi.version>3.9</poi.version>
+        <nougat.version>1.0.1</nougat.version>
+        <spreadsheet-api.version>1.0-SNAPSHOT</spreadsheet-api.version>
+
+        <!-- distributionManagement [[ -->
+        <!--
+         | download:
+         |    snapshot: https://oss.sonatype.org/content/groups/public
+         |    release:  https://oss.sonatype.org/content/groups/staging
+         -->
+        <dist.mgt.snap-repo.id>ossrh</dist.mgt.snap-repo.id>
+        <dist.mgt.snap-repo.url>https://oss.sonatype.org/content/repositories/snapshots/</dist.mgt.snap-repo.url>
+        <dist.mgt.repo.id>ossrh</dist.mgt.repo.id>
+        <dist.mgt.repo.url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</dist.mgt.repo.url>
+        <!-- ]] distributionManagement -->
+        <gpg.executable>C:/Program Files (x86)/GnuPG/bin/gpg.exe</gpg.executable>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- 效率没有 POI 高, 暂时不用了.
+            <dependency>
+                <groupId>org.docx4j</groupId>
+                <artifactId>docx4j</artifactId>
+                <version>3.3.4</version>
+            </dependency>
+            -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>jexcelapi</groupId>
+                <artifactId>jxl</artifactId>
+                <version>${jxl.version}</version>
+                <optional>true</optional>
+            </dependency>
+            <!-- poi BEGIN -->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${poi.version}</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi.version}</version>
+                <optional>true</optional>
+            </dependency>
+            <!-- poi END -->
+            <dependency>
+                <groupId>com.github.nomou</groupId>
+                <artifactId>nougat-lang</artifactId>
+                <version>${nougat.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <!-- java source & javadoc plugin [[ -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <configuration>
+                    <attach>true</attach>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <quiet>true</quiet>
+                    <charset>UTF-8</charset>
+                    <encoding>UTF-8</encoding>
+                    <docencoding>UTF-8</docencoding>
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                </configuration>
+            </plugin>
+            <!-- ]] java source & javadoc plugin -->
+            <!-- GPG plugin [[ -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- ]] GPG -->
+        </plugins>
+    </build>
+</project>
