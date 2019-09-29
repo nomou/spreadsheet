@@ -11,10 +11,10 @@ import java.util.Arrays;
  */
 public class FormulaTest {
     public static void main(String[] args) {
-//        final InputStream in = FormulaTest.class.getResourceAsStream("/formula.xls");
-//        final SpreadsheetParser parser = new LegacySpreadsheetParser2(in);
-        final InputStream in = FormulaTest.class.getResourceAsStream("/formula.xlsx");
-        final SpreadsheetParser parser = new OpenXMLSpreadsheetParser(in);
+        final InputStream in = FormulaTest.class.getResourceAsStream("/formula.xls");
+        final SpreadsheetParser parser = new LegacySpreadsheetParser2(in);
+//        final InputStream in = FormulaTest.class.getResourceAsStream("/formula.xlsx");
+//        final SpreadsheetParser parser = new OpenXMLSpreadsheetParser(in);
         try {
             do {
                 final Object[] record = parser.nextRecord(true);

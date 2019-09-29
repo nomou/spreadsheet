@@ -7,7 +7,7 @@
     <groupId>com.github.nomou</groupId>
     <artifactId>spreadsheet</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <name>spreadsheet</name>
     <description>a simple streaming spreadsheet lib</description>
@@ -79,7 +79,7 @@
         <jxl.version>2.6</jxl.version>
         <poi.version>3.9</poi.version>
         <nougat.version>1.0.2</nougat.version>
-        <spreadsheet.version>1.0.0</spreadsheet.version>
+        <spreadsheet.version>1.0.1</spreadsheet.version>
 
         <!-- distributionManagement [[ -->
         <!--
@@ -205,6 +205,27 @@
                 </executions>
             </plugin>
             <!-- ]] GPG -->
+
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.8</version>
+                <!--
+                <executions>
+                    <execution>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>log4web-sample</artifactId>
+                    </execution>
+                </executions>
+                -->
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                    <!--<skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>-->
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
