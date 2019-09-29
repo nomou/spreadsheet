@@ -288,7 +288,7 @@ class OpenXMLSpreadsheetParser extends AbstractSpreadsheetParser {
             if (HSSFDateUtil.isADateFormat(formatIndex, n)) {
                 final Double d = Double.parseDouble(n);
                 parsed = HSSFDateUtil.getJavaDate(d);
-            } else if (formatString != null) {
+            } else if (null != formatString && null != n) {
                 parsed = new DataFormatter().formatRawCellContents(Double.parseDouble(n), formatIndex, formatString);
             } else {
                 parsed = n;

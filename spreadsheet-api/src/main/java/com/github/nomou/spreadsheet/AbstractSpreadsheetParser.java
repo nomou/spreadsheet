@@ -112,6 +112,7 @@ public abstract class AbstractSpreadsheetParser implements SpreadsheetParser {
                     noMoreRecord = false;
                     break;
                 }
+                noMoreRecord = true;
                 values.clear();
             }
         }

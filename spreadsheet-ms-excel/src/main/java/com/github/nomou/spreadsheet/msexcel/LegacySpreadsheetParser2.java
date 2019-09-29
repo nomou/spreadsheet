@@ -9,19 +9,7 @@ import org.apache.poi.hssf.eventusermodel.MissingRecordAwareHSSFListener;
 import org.apache.poi.hssf.eventusermodel.dummyrecord.LastCellOfRowDummyRecord;
 import org.apache.poi.hssf.eventusermodel.dummyrecord.MissingCellDummyRecord;
 import org.apache.poi.hssf.eventusermodel.dummyrecord.MissingRowDummyRecord;
-import org.apache.poi.hssf.record.BOFRecord;
-import org.apache.poi.hssf.record.BoolErrRecord;
-import org.apache.poi.hssf.record.BoundSheetRecord;
-import org.apache.poi.hssf.record.CellValueRecordInterface;
-import org.apache.poi.hssf.record.EOFRecord;
-import org.apache.poi.hssf.record.FormulaRecord;
-import org.apache.poi.hssf.record.LabelRecord;
-import org.apache.poi.hssf.record.LabelSSTRecord;
-import org.apache.poi.hssf.record.NumberRecord;
-import org.apache.poi.hssf.record.Record;
-import org.apache.poi.hssf.record.RecordFactoryInputStream;
-import org.apache.poi.hssf.record.RowRecord;
-import org.apache.poi.hssf.record.SSTRecord;
+import org.apache.poi.hssf.record.*;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -126,7 +114,7 @@ class LegacySpreadsheetParser2 extends AbstractSpreadsheetParser {
                 final CellValueRecordInterface cell = (CellValueRecordInterface) this._next;
                 this.col = cell.getColumn();
                 this.row = cell.getRow();
-                this.value = asJavaObject(cell);
+                this.value = asJavaObject(cell, it);
             } else if (this._next instanceof MissingCellDummyRecord) {
                 final MissingCellDummyRecord cell = (MissingCellDummyRecord) this._next;
                 this.col = cell.getColumn();
@@ -201,7 +189,7 @@ class LegacySpreadsheetParser2 extends AbstractSpreadsheetParser {
                     newEvent = START_RECORD;
                 } else {
                     this.col = cell.getColumn();
-                    this.value = asJavaObject(cell);
+                    this.value = asJavaObject(cell, it);
 //                System.out.println("--");
                     // } else if (record instanceof CellRecord) {
                     newEvent = START_CELL;
@@ -297,7 +285,7 @@ class LegacySpreadsheetParser2 extends AbstractSpreadsheetParser {
         this.workbookIt = null;
     }
 
-    private Object asJavaObject(final CellValueRecordInterface cell) {
+    private Object asJavaObject(final CellValueRecordInterface cell, final WorkbookIterator it) {
         final WorkbookIterator workbook = this.workbookIt;
 
         Object ret = null;
@@ -324,10 +312,23 @@ class LegacySpreadsheetParser2 extends AbstractSpreadsheetParser {
             if (HSSFCell.CELL_TYPE_BLANK == resultType || HSSFCell.CELL_TYPE_ERROR == resultType) {
                 ret = null;
             } else if (HSSFCell.CELL_TYPE_BOOLEAN == resultType) {
+                formula.getCachedBooleanValue();
                 ret = 0 != Double.valueOf(formula.getValue()).intValue();
             } else if (HSSFCell.CELL_TYPE_STRING == resultType) {
-                // FIXME
-                // stringFormulaColumn = col;
+                /*-
+                 * true if this FormulaRecord is followed by a StringRecord representing the cached text result of the formula evaluation.
+                 */
+                if (!formula.hasCachedResultString()) {
+                    throw new IllegalStateException("text formula not has cached result string");
+                } else if (!it.hasNext()) {
+                    throw new IllegalStateException("text formula record is not flowed string record");
+                } else {
+                    final Record record = it.next();
+                    if (!(record instanceof StringRecord)) {
+                        throw new IllegalStateException("text formula record is not flowed string record");
+                    }
+                    ret = ((StringRecord) record).getString();
+                }
             } else {    // 默认为 Number
                 final double value = formula.getValue();
                 ret = workbook.isDateRecord(formula) ? HSSFDateUtil.getJavaDate(value) : value;

@@ -96,15 +96,15 @@
     try {
         parser.configure("encoding", "UTF-8");
 
-        Object[] record;
         do {
-            record = parser.nextRecord(true);
+            final Object[] record = parser.nextRecord(true);
             if (null != record) {
                 final int row = parser.getRow();
-                final SpreadsheetRecord r = SpreadsheetRecord.wrap(record);
-                System.out.println(row + ":" + Arrays.toString(record) + "/" + r.getString("A"));
+                final int sheet = parser.getWorksheetIndex();
+
+                System.out.println("sheet" + sheet + ":" + row + ":" + Arrays.toString(record));
             }
-        } while (null != record);
+        } while (SpreadsheetParser.END_WORKBOOK != parser.getEventType());
     } finally {
         parser.close();
     }
