@@ -228,4 +228,13 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>osx</id>
+            <properties>
+                <gpg.executable>gpg</gpg.executable>
+            </properties>
+        </profile>
+    </profiles>
 </project>
