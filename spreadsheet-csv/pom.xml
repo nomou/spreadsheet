@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.github.nomou</groupId>
+        <groupId>com.github.nomou.spreadsheet</groupId>
         <artifactId>spreadsheet</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
     </parent>
 
     <artifactId>spreadsheet-csv</artifactId>
@@ -23,7 +23,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.nomou</groupId>
+            <groupId>com.github.nomou.spreadsheet</groupId>
             <artifactId>spreadsheet-api</artifactId>
         </dependency>
         <dependency>

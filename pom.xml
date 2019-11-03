@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.nomou</groupId>
+    <groupId>com.github.nomou.spreadsheet</groupId>
     <artifactId>spreadsheet</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <name>spreadsheet</name>
     <description>a simple streaming spreadsheet lib</description>
@@ -78,8 +78,8 @@
         <slf4j.version>1.7.7</slf4j.version>
         <jxl.version>2.6</jxl.version>
         <poi.version>3.9</poi.version>
-        <nougat.version>1.0.2</nougat.version>
-        <spreadsheet.version>1.0.1</spreadsheet.version>
+        <nougat.version>1.0.6</nougat.version>
+        <spreadsheet.version>1.0.2</spreadsheet.version>
 
         <!-- distributionManagement [[ -->
         <!--
@@ -142,7 +142,7 @@
                 <version>${nougat.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.nomou</groupId>
+                <groupId>com.github.nomou.spreadsheet</groupId>
                 <artifactId>spreadsheet-api</artifactId>
                 <version>${spreadsheet.version}</version>
             </dependency>
