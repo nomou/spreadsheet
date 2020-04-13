@@ -7,7 +7,7 @@
     <dependency>
         <groupId>com.github.nomou</groupId>
         <artifactId>nougat-lang</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.8</version>
     </dependency>
     
     <dependency>

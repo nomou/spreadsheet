@@ -150,6 +150,22 @@ class LegacySpreadsheetParser2 extends AbstractSpreadsheetParser {
              * --- worksheet EOF
              * --- EOF
              */
+            /*
+            if (record instanceof BOFRecord) {
+                final int type = ((BOFRecord) record).getType();
+                if (BOFRecord.TYPE_WORKSPACE_FILE == type) {
+                    System.out.println("=========");
+                } else if (BOFRecord.TYPE_WORKBOOK == type) {
+
+                } else if (BOFRecord.TYPE_WORKSHEET == type) {
+                } else if (BOFRecord.TYPE_CHART == type) {
+                } else if (BOFRecord.TYPE_VB_MODULE == type) {
+                } else if (BOFRecord.TYPE_EXCEL_4_MACRO == type) {
+                } else {
+
+                }
+            } else
+            */
             if (record instanceof EOFRecord) {
                 if (START_WORKBOOK == t) {
                     newEvent = EOF;

@@ -5,6 +5,7 @@ import com.github.nomou.spreadsheet.SpreadsheetException;
 import com.github.nomou.spreadsheet.SpreadsheetParser;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.openxml4j.opc.PackagePart;
@@ -14,17 +15,13 @@ import org.apache.poi.openxml4j.opc.PackageRelationshipTypes;
 import org.apache.poi.openxml4j.opc.PackagingURIHelper;
 import org.apache.poi.ss.usermodel.BuiltinFormats;
 import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
+import org.apache.poi.xssf.eventusermodel.XSSFReader;
+import org.apache.poi.xssf.model.SharedStringsTable;
 import org.apache.poi.xssf.model.StylesTable;
-import org.apache.poi.xssf.model.ThemesTable;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRelation;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.xmlbeans.XmlException;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheet;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorkbook;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.WorkbookDocument;
-import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -34,16 +31,27 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * POI-based spreadsheet parser for Microsoft Excel 2007+.
  *
  * @author vacoor
  * @see <a href="http://poi.apache.org/">POI</a>
+ * @see XSSFReader
+ * @see org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler
  * @since 1.0
  */
 class OpenXMLSpreadsheetParser extends AbstractSpreadsheetParser {
+    private static final Set<String> WORKSHEET_RELS = Collections.unmodifiableSet(
+            new HashSet<String>(Arrays.asList(XSSFRelation.WORKSHEET.getRelation(), XSSFRelation.CHARTSHEET.getRelation()))
+    );
+
     /* *********************
      *     POI Objects.
      * ******************* */
@@ -60,7 +68,7 @@ class OpenXMLSpreadsheetParser extends AbstractSpreadsheetParser {
     /**
      * Workbook shared string table.
      */
-    private ReadOnlySharedStringsTable sharedStringsTable;
+    private SharedStringsTable sharedStringsTable;
 
     /**
      * Workbook style table.
@@ -70,22 +78,31 @@ class OpenXMLSpreadsheetParser extends AbstractSpreadsheetParser {
     /**
      * Worksheets summary.
      */
-    private CTSheet[] worksheets;
+    private XSSFReader.SheetIterator worksheets;
 
     /**
-     * Current worksheet part.
+     * Worksheets rel-id : worksheet part name.
      */
-    private PackagePart worksheetPart;
+    private Map<String, PackagePartName> worksheetRelNames;
 
     /**
      * Current worksheet parser.
      */
     private OpenXMLWorksheetParser worksheetParser = null;
 
+    /**
+     * Creates a Open-XML spreadsheet parser.
+     *
+     * @param in the Open-XML spreadhseet stream
+     * @throws SpreadsheetException
+     */
     public OpenXMLSpreadsheetParser(final InputStream in) throws SpreadsheetException {
-        initInputSource(in);
+        this.initInputSource(in);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SpreadsheetParser configure(final String option, final Object value) {
         return this;
@@ -96,7 +113,7 @@ class OpenXMLSpreadsheetParser extends AbstractSpreadsheetParser {
      */
     @Override
     public int getNumberOfWorksheets() {
-        return null != this.worksheets ? this.worksheets.length : 0;
+        return worksheetRelNames.size();
     }
 
     /**
@@ -145,27 +162,14 @@ class OpenXMLSpreadsheetParser extends AbstractSpreadsheetParser {
     @Override
     protected int doNext() throws SpreadsheetException {
         final int t = this.eventType;
-        final int worksheets = this.worksheets.length;
-        final int worksheetIndex = this.worksheetIndex;
-
         try {
             int newEvent = EOF;
-            if (START_WORKBOOK == t) {
-                if (0 < worksheets) {
-                    this.worksheetIndex = 0;
-                    doPreParseWorksheet();
+            if (START_WORKBOOK == t || END_WORKSHEET == t) {
+                if (worksheets.hasNext()) {
+                    this.doPreParseWorksheet();
                     newEvent = START_WORKSHEET;
                 } else {
-                    doPostParseWorkbook();
-                    newEvent = END_WORKBOOK;
-                }
-            } else if (END_WORKSHEET == t) {
-                if (worksheetIndex < worksheets - 1) {
-                    this.worksheetIndex++;
-                    doPreParseWorksheet();
-                    newEvent = START_WORKSHEET;
-                } else {
-                    doPostParseWorkbook();
+                    this.doPostParseWorkbook();
                     newEvent = END_WORKBOOK;
                 }
             } else if (START_WORKSHEET == t || START_RECORD == t || END_RECORD == t || START_CELL == t || END_CELL == t) {
@@ -175,14 +179,13 @@ class OpenXMLSpreadsheetParser extends AbstractSpreadsheetParser {
                 }
                 newEvent = innerEvent;
             }
-
             return newEvent;
         } catch (final InvalidFormatException e) {
             throw new SpreadsheetException(e.getMessage(), e.getCause());
         } catch (final IOException e) {
             throw new SpreadsheetException(e);
         } catch (final XMLStreamException e) {
-            throw new SpreadsheetException(e);
+            throw new SpreadsheetException("XML Stream error", e);
         }
     }
 
@@ -195,7 +198,7 @@ class OpenXMLSpreadsheetParser extends AbstractSpreadsheetParser {
             this.eventType = EOF;
         }
         try {
-            doPostParseWorkbook();
+            this.doPostParseWorkbook();
         } catch (final IOException e) {
             throw new SpreadsheetException(e);
         }
@@ -230,8 +233,6 @@ class OpenXMLSpreadsheetParser extends AbstractSpreadsheetParser {
         } catch (final IOException e) {
             throw new SpreadsheetException(e);
         } catch (final XmlException e) {
-            throw new SpreadsheetException(e);
-        } catch (final SAXException e) {
             throw new SpreadsheetException(e);
         }
     }
@@ -307,34 +308,36 @@ class OpenXMLSpreadsheetParser extends AbstractSpreadsheetParser {
     /**
      * TODO doc me.
      */
-    void doPreParseWorkbook() throws IOException, SAXException, XmlException {
-        final OPCPackage spreadsheet = this.spreadsheet;
-
-        // new XSSFReader(spreadsheet);
-        final List<PackagePart> docParts = spreadsheet.getPartsByRelationshipType(PackageRelationshipTypes.CORE_DOCUMENT);
-        final PackagePart workbookPart = 0 < docParts.size() ? docParts.get(0) : null;
-        if (null == workbookPart) {
-            throw new IllegalStateException("Can not be found CORE_DOCUMENT from the input source");
-        }
-
-        final ReadOnlySharedStringsTable sharedStringsTable = new ReadOnlySharedStringsTable(spreadsheet);
-        final List<PackagePart> styleParts = spreadsheet.getPartsByContentType(XSSFRelation.STYLES.getContentType());
-        final PackagePart stylePart = 0 < styleParts.size() ? styleParts.get(0) : null;
-        final StylesTable stylesTable = null != stylePart ? new StylesTable(stylePart, null) : null;
-        if (null != stylePart) {
-            final List<PackagePart> themeParts = spreadsheet.getPartsByContentType(XSSFRelation.THEME.getContentType());
-            if (0 < themeParts.size()) {
-                stylesTable.setTheme(new ThemesTable(themeParts.get(0), null));
+    void doPreParseWorkbook() throws IOException, XmlException {
+        try {
+            final PackageRelationship coreDocRelationship = spreadsheet.getRelationshipsByType(PackageRelationshipTypes.CORE_DOCUMENT).getRelationship(0);
+            if (null == coreDocRelationship) {
+                if (null != spreadsheet.getRelationshipsByType(PackageRelationshipTypes.STRICT_CORE_DOCUMENT).getRelationship(0)) {
+                    throw new XmlException("Strict OOXML isn't currently supported, please see POI bug #57699");
+                }
+                throw new XmlException("OOXML file structure broken/invalid - no core document found!");
             }
+            this.workbookPart = spreadsheet.getPart(coreDocRelationship);
+
+            /*-
+             * StyleTable 不同版本构造器不一样, 因此这里改用 XSSFReader 来读取.
+             */
+            final XSSFReader reader = new XSSFReader(spreadsheet);
+            this.stylesTable = reader.getStylesTable();
+            this.sharedStringsTable = reader.getSharedStringsTable();
+            this.worksheets = (XSSFReader.SheetIterator) reader.getSheetsData();
+
+            final Map<String, PackagePartName> sheetRelNameMap = new HashMap<String, PackagePartName>();
+            for (final PackageRelationship rel : workbookPart.getRelationships()) {
+                String relType = rel.getRelationshipType();
+                if (WORKSHEET_RELS.contains(relType)) {
+                    sheetRelNameMap.put(rel.getId(), PackagingURIHelper.createPartName(rel.getTargetURI()));
+                }
+            }
+            this.worksheetRelNames = sheetRelNameMap;
+        } catch (final OpenXML4JException ex) {
+            throw new XmlException(ex);
         }
-
-        final CTWorkbook workbook = WorkbookDocument.Factory.parse(workbookPart.getInputStream()).getWorkbook();
-        final List<CTSheet> sheets = workbook.getSheets().getSheetList();
-
-        this.workbookPart = workbookPart;
-        this.sharedStringsTable = sharedStringsTable;
-        this.stylesTable = stylesTable;
-        this.worksheets = sheets.toArray(new CTSheet[sheets.size()]);
     }
 
     /**
@@ -344,10 +347,9 @@ class OpenXMLSpreadsheetParser extends AbstractSpreadsheetParser {
         // reset worksheet.
         this.worksheetIndex = -1;
         this.worksheetName = null;
+        this.worksheets = null;
+        this.worksheetRelNames = null;
 
-        closeQuiet(this.workbookPart);
-
-        this.worksheets = new CTSheet[0];
         this.stylesTable = null;
         this.sharedStringsTable = null;
         this.workbookPart = null;
@@ -362,19 +364,11 @@ class OpenXMLSpreadsheetParser extends AbstractSpreadsheetParser {
      * TODO doc me.
      */
     void doPreParseWorksheet() throws XMLStreamException, IOException, InvalidFormatException {
-        final CTSheet[] worksheets = this.worksheets;
-        final PackagePart workbookPart = this.workbookPart;
-        final int worksheetIndex = this.worksheetIndex;
-        final String id = worksheets[worksheetIndex].getId();
+        final InputStream worksheetIn = this.worksheets.next();
 
-        final PackageRelationship rel = workbookPart.getRelationship(id);
-        final PackagePartName relName = PackagingURIHelper.createPartName(rel.getTargetURI());
-        final PackagePart worksheetPart = workbookPart.getPackage().getPart(relName);
-        final InputStream in = worksheetPart.getInputStream();
-
-        this.worksheetName = worksheets[worksheetIndex].getName();
-        this.worksheetPart = worksheetPart;
-        this.worksheetParser = new OpenXMLWorksheetParser(in);
+        this.worksheetIndex++;
+        this.worksheetName = this.worksheets.getSheetName();
+        this.worksheetParser = new OpenXMLWorksheetParser(worksheetIn);
     }
 
     /**
@@ -382,14 +376,9 @@ class OpenXMLSpreadsheetParser extends AbstractSpreadsheetParser {
      */
     void doPostParseWorksheet() throws IOException, XMLStreamException {
         closeQuiet(this.worksheetParser);
-        closeQuiet(this.worksheetPart);
+//        closeQuiet(this.worksheetPart);
 
         this.worksheetParser = null;
-        this.worksheetPart = null;
-
-        // reset worksheet, move to doPostParseWorkbook.
-        // this.worksheetIndex = -1;
-        // this.worksheetName = null;
     }
 
     /**
