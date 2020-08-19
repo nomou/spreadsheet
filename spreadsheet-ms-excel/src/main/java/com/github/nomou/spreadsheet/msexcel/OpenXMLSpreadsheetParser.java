@@ -246,7 +246,9 @@ class OpenXMLSpreadsheetParser extends AbstractSpreadsheetParser {
      */
     protected Object toJavaObject(final String t, final String s, final String value) {
         Object parsed = null;
-        if ("b".equals(t)) {
+        if (null == value) {
+            parsed = null;
+        } else if ("b".equals(t)) {
             // boolean
             parsed = 1 > value.length() || value.charAt(0) == '0' ? Boolean.FALSE : Boolean.TRUE;
         } else if ("e".equals(t)) {
